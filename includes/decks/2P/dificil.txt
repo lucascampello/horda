@@ -1,0 +1,18 @@
+1;Forsaken Wastes;3
+1;Infectious Host;1
+1;Damnation;2
+1;Plague Wind;2
+1;Endless Ranks of the Dead;3
+1;Army of the Damned;2
+1;Rotting Fensnake;1
+1;Call to the Grave;3
+2;Death Baron;1
+2;Undead Warchief;1
+2;Noxious Ghoul;1
+2;Bad Moon;3
+2;Walking Corpse;1
+2;Grave Titan;1
+4;Soulless One;1
+4;Cackling Fiend;1
+6;Zombie Giant;0;1
+36;Zombie;0;1

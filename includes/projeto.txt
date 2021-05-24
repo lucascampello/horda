@@ -1,0 +1,27 @@
+1;0;**;Noxious Ghoul;http://magiccards.info/pch/en/35.html
+1;0;*;Carrion Wurm;http://magiccards.info/tr/en/55.html
+1;0;2;Death Baron;http://magiccards.info/pch/en/25.html
+1;0;*;Skulking Knight;http://magiccards.info/ts/en/130.html
+1;0;*;Unbreathing Horde;http://magiccards.info/isd/en/121.html
+1;0;1;Undead Warchief;http://magiccards.info/pch/en/44.html
+1;0;**;Yixlid Jailer;http://magiccards.info/fut/en/93.html
+1;0;6;Damnation;http://magiccards.info/pc/en/85.html
+1;0;*;Twilights Call;http://magiccards.info/ddj/en/76.html
+1;0;*;Call to the Grave;http://magiccards.info/m12/en/85.html
+1;0;1;Endless Ranks of the Dead;http://magiccards.info/isd/en/99.html
+1;0;*;Maggot Carrier;http://magiccards.info/8e/en/142.html
+1;0;*;Nested Ghoul;http://magiccards.info/mbs/en/48.html
+2;0;**;Forsaken Wastes;http://magiccards.info/mr/en/23.html
+2;0;*;Army of the Damned;http://magiccards.info/isd/en/87.html
+2;0;*;Plague Wind;http://magiccards.info/10e/en/169.html
+2;0;1;Grave Titan;http://magiccards.info/c14/en/145.html
+2;0;*;Infectious Host;http://magiccards.info/rav/en/91.html
+2;0;*;Rotting Fensnake;http://magiccards.info/isd/en/113.html
+2;0;*;Severed Legion;http://magiccards.info/10e/en/177.html
+2;0;**;Soulless One;http://magiccards.info/pch/en/41.html
+2;0;*;Vengeful Dead;http://magiccards.info/sc/en/80.html
+2;0;*;Bad Moon;http://magiccards.info/c14/en/135.html
+3;0;*;Delirium Skeins;http://magiccards.info/di/en/41.html
+4;0;*;Cackling Fiend;http://magiccards.info/br/en/11.html
+5;0;-;Zombie Giant 5/5 (Token);http://magiccards.info/extra/token/zendikar/zombie-giant.html
+55;0;-;Zombie 2/2 (Token);
