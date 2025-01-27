@@ -1,0 +1,13 @@
+1;Drove of Elves;1
+1;Elven Riders;1
+2;Gaeas Skyfolk;1
+1;Heedless One;1
+1;Poison-Tip Archer;1
+1;Steel Leaf Champion;1
+1;Elvish Champion;1
+1;Eladamri, Lord of Leaves;1
+1;Elvish Doomsayer;1
+1;Overrun;2
+1;Eyeblight Massacre;2
+10;Elf Warrior 2;0;1
+8;Elf Warrior;0;1

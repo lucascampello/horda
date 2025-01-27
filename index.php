@@ -1,7 +1,10 @@
 <?php
-session_start();
+require("classes/Autoloader.class.php");
 require("includes/define.inc.php");
-require("classes/Jogo.class.php");
+session_start();
+
+use Classes\Jogo;
+
 $objJogo = new Jogo();
 
 if(!empty($_POST))
@@ -46,22 +49,30 @@ if(!empty($_POST))
 		<title>Horda de Zumbi</title>
         <link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,600,700,900&display=swap" rel="stylesheet">
 		<link rel="stylesheet" href="css/index.css">
-		<link rel="shortcut icon" href="images/icone.ico" type="image/x-icon" />
+		<link rel="shortcut icon" href="images/icone.png" type="image/png" />
 	</head>
 	<body>
 		<div id="container">
             <section id="login">
                 <main>
-					<img src="images/logo.png">
+					<img src="images/logo.png">					
 					<form action="index.php" method="post" id="form1">
+						<label>Horda</label> 
+						<select name="tipo">
+							<?php
+								foreach(HORDA as $horda)
+									echo "<option value=\"$horda\">$horda</option>";
+							?>
+						</select> <br />
 						<label>Jogador 1:</label> <input type="text" value="<?php echo (empty($_POST['jogador'][1])? "" : $_POST['jogador'][1]);?>" name="jogador[1]" /> <br/>
 						<label>Jogador 2:</label> <input type="text" value="<?php echo (empty($_POST['jogador'][2])? "" : $_POST['jogador'][2]);?>" name="jogador[2]" /> <br/>
 						<label>Jogador 3:</label> <input type="text" value="<?php echo (empty($_POST['jogador'][3])? "" : $_POST['jogador'][3]);?>" name="jogador[3]" /> <br/>
 						<label>Nível :</label> 
 						<select name='nivel'>
-							<option value='facil' selected>Facil</option>
-							<option value='medio'> Medio </option>
-							<option value='dificil'> Dificil </option>
+							<?php
+								foreach(NIVEL as $nivel)
+									echo "<option value=\"$nivel\">$nivel</option>";
+							?>
 						</select>
 						<button type="submit" name="action" form="form1" value="Submit">Começar jogo!</button>
 					</form>

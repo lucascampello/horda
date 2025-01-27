@@ -1,0 +1,14 @@
+1;Prickly Boggart;1
+1;Skirk Shaman;1
+1;Battle Squadron;1
+1;Beetleback Chief;1
+1;Goblin Instigator;1
+1;Goblin King;1
+1;Boartusk Liege;1
+1;Daggersail Aeronaut;1
+1;Boggart Ram Gang;1
+1;Volcanic Rush;2
+1;Hordeling Outburst;2
+1;Dralnus Crusade;3
+10;Goblin 2;0;1
+8;Goblin;0;1

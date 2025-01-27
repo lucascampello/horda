@@ -1,48 +1,49 @@
 <?php
-require ("Generic.class.php");
+namespace Classes;
+use Classes\Generic;
+use Classes\Graphic;
+
 class Jogo extends Generic {
+	private array $deck;					// Lista BASE de Cartas do Deck (import txt)
+	private array $deckGame;				// Lista de Cartas do Deck (Pós-Parsing)
+	private array $library;					// Lista de Cartas do Deck (InGame)
+	private array $hand;					// Lista de Cartas na Mão 
+	private array $board;					// Lista de Cartas no Campo
+	private array $removed;					// Lista de Cartas na Zona de Exílio
+	private array $cemiterio;				// Lista de Cartas na Zona do Cemitério
+	private array $players;					// Dados Relativo aos Jogadores [SOBREVIVENTES]
+	private string $nivel;					// Nível de Dificuldade da Partida
+
+	private int $totalLibrary;				// Contador de Cartas na Mão
+	private int $totalRemoved;				// Contador de Cartas Removidas
+	private int $totalCemiterio;			// Contador de Cartas no Cemitério
+
+	private string $horda;					// Tipo de Horda
+
 	public function __construct() {
-		$this->options = array ();
-		/**
-		 * Deck (txt do include)
-		 * 
-		 * @var array
-		 */
+		// PREPARAÇÃO DAS LISTAS
 		$this->deck = array ();
-		/**
-		 * Deck explitado
-		 * 
-		 * @var array
-		 */
 		$this->deckGame = array ();
-		/**
-		 * Deck de compra
-		 * 
-		 * @var array
-		 */
 		$this->library = array ();
-		/**
-		 * Cartas na m�o
-		 * 
-		 * @var array
-		 */
 		$this->hand = array ();
-		
 		$this->board = array ();
-		
 		$this->removed = array ();
-		$this->totalRemoved = 0;
-		
-		$this->cardAtual = 0;
-		$this->totalLibrary = 0;
 		$this->cemiterio = array ();
-		$this->totalCemiterio = 0;
+
+		// PREPARAÇÃO DOS CONTADORES 
+		$this->totalRemoved = $this->totalLibrary = $this->totalCemiterio = 0;
+		
+		$this->horda = 'Zumbi'; // Pré-Define o Tipo Base
+		$this->nivel = 'Fácil'; // Pré-Define o Nível de Dificuldade Base
 	}
 	
+	// Função Inicial que Carrega os Dados e Guarda na Sessão da Aplicação
 	public function startGame() {
-		self::setPlayers ( $_POST ['jogador'] );
-		self::readDeck ();
-		self::setGameDeck ();
+		self::setPlayers ($_POST ['jogador']);
+		self::setHorda($_POST['tipo']);
+		self::setNivel($_POST['nivel']);
+		self::readDeck ();					// Carrega o Deck (TXT)
+		self::setGameDeck ();				// Armazena no Deck InGame e Embaralha
 		self::saveGame ();
 	}
 	
@@ -52,81 +53,82 @@ class Jogo extends Generic {
 	 * @param array $dados        	
 	 */
 	private function setPlayers($dados) {
-		$contador = 1;
-		// Para cada jogador
-		foreach ( $dados as $jogador ) {
-			// Se n�o estiver vazio
-			if (! empty ( $jogador )) {
-				$this->players [$contador] ['nome'] = $jogador; // Preenche a posi��o do jogador
-				$contador ++;
-			}
-		}
-		$this->players ['num_players'] = count ( $this->players );
-		$this->players ['vida'] = MULTIPLICADOR_VIDA * count ( $this->players ); // Define a vida total do deck
+		$this->players ['num_players'] = count ( $dados );
 	}
-	
-	public function playCard() {
+
+	/**
+	 * Define a Horda do Jogo
+	 * 
+	 * @param string $horda
+	 */
+	private function setHorda($horda) : void
+	{
+		$this->horda = (in_array(ucfirst($horda), HORDA))? $horda : $this->horda;
 	}
-	
+
+	/**
+	 * Define o Nível do Jogo
+	 * 
+	 * @param string $nivel
+	 */
+	private function setNivel($nivel) : void
+	{
+		$this->nivel = (in_array($nivel, NIVEL))? $nivel : $this->nivel;
+	}
+
 	/**
 	 * Inicializa lendo TODO o deck
 	 */
 	private function readDeck() 
 	{
-		$deck = file ( "includes/decks/".$this->players['num_players']."P/".$_POST['nivel'].".txt" );
+		$deck = file ( "includes/decks/".$this->horda."/".$this->players['num_players']."P/".$this->nivel.".txt" );
 		if($this->players['num_players'] == 1)
 			$this->totalLibrary = TAMANHO_1PLAYER;
 		else if($this->players['num_players'] == 2)
 			$this->totalLibrary = TAMANHO_2PLAYERS;
 		else if($this->players['num_players'] == 3)
 			$this->totalLibrary = TAMANHO_3PLAYERS;
-		else if($this->players['num_players'] == 4)
-			$this->totalLibrary = TAMANHO_4PLAYERS;
-		else if($this->players['num_players'] == 5) 
-			$this->totalLibrary = TAMANHO_5PLAYERS;
 
 		// Cria um contador
 		$contador_carta = 0;
 		// Para cada elemento no texto
 		foreach ( $deck as $carta ) { // explica as configura��es e coloca indice do array DECK
-			$tmp = explode ( ';', $carta );
-			$img = implode("_",explode(" ",$tmp[1]));
+			$cartaTemporaria = explode ( ';', $carta );
+			$img = implode("_",explode(" ",$cartaTemporaria[COLUNA_NOME]));
 			
-			$this->deck [$contador_carta] ['quantidade'] = $tmp [0];
-			$this->deck [$contador_carta] ['nome'] = $tmp [1];
-			$this->deck [$contador_carta] ['icon'] = "images/cards/icons/" . $img . ".jpg";
-			$this->deck [$contador_carta] ['image'] = "images/cards/" . $img . ".jpg";
-			$this->deck [$contador_carta] ['type'] = $tmp [2];
-			if($tmp[2] == TOKEN OR $tmp[2] == CREATURE)
+			$this->deck [$contador_carta] ['quantidade'] = $cartaTemporaria[COLUNA_QUANTIDADE];
+			$this->deck [$contador_carta] ['nome'] = $cartaTemporaria[COLUNA_NOME];
+			$this->deck [$contador_carta] ['icon'] = "images/".$this->horda."/card/" . $img . ".jpg";
+			$this->deck [$contador_carta] ['image'] = $this->deck [$contador_carta] ['icon'];
+			$this->deck [$contador_carta] ['type'] = $cartaTemporaria[COLUNA_TIPO];
+			if($cartaTemporaria[COLUNA_TIPO] == TOKEN OR $cartaTemporaria[COLUNA_TIPO] == CREATURE)
 			{
-				$this->deck [$contador_carta] ['tap'] = "images/cards/tap/" . $img . ".jpg";
-				$this->deck [$contador_carta] ['attack'] = "images/cards/attack/" . $img . ".jpg";
+				$this->deck [$contador_carta] ['tap'] = "images/".$this->horda."/tap/" . $img . ".jpg";
+				$this->deck [$contador_carta] ['attack'] = "images/".$this->horda."/attack/" . $img . ".jpg";
 			}	
 			$contador_carta ++;
 		}
 	}
 	
-	/**
-	 */
 	private function setGameDeck() {
 		// COPIA o Deck para uma vari�vel LOCAL
 		$deck = $this->deck;
-		$zombies = array_pop ( $deck ); // Extrai o ultimo elemento do array (Ficha padr�o)
+		$zombies = array_pop ( $deck ); // Extrai o ultimo elemento do array (Ficha padrao)
 		                             
 		// Inicializa o Deck do Jogo
 		for($i = 0; $i < $this->totalLibrary; $i ++)
 			$this->deckGame [$i] = array ();
 			
-			// Para cada elemento do DECK (Sem o Zumbi Padr�o)
+		// Para cada elemento do DECK (Sem a Ficha de Zumbi)
 		foreach ( $deck as $carta ) {
 			/**
-			 * Para cada quantidade existente da c�pia daquela carta
+			 * Para cada quantidade existente da copia daquela carta
 			 */
 			for($i = 0; $i < $carta ['quantidade']; $i ++) {
 				// Posiciona a carta no deck FINAL
-				for($set = 0; $set != 1;) { // Randomiza uma posi��o
+				for($set = 0; $set != 1;) { // Randomiza uma posicao
 					$id = rand ( 0, $this->totalLibrary - 1 );
-					// Se � uma posi��o v�lida (Aloca no deck e PARA)
+					// Se é uma posição válida (Aloca no deck e BUSCA A PRÓXIMA CARTA)
 					if (empty ( $this->deckGame [$id] )) {
 						$this->deckGame [$id] = $carta;
 						// Elimina o item quantidade da carta
@@ -147,9 +149,7 @@ class Jogo extends Generic {
 		$this->library = $this->deckGame;
 	}
 	
-	/**
-	 * Torna a sess�o local os dados das classes
-	 */
+	// Grava os Dados da Partida na Sessão
 	public function saveGame() {
 		$_SESSION ['game'] ['players'] = $this->players;
 		$_SESSION ['game'] ['deck'] = $this->deck;
@@ -162,11 +162,11 @@ class Jogo extends Generic {
 		$_SESSION ['game'] ['totalCemiterio'] = $this->totalCemiterio;
 		$_SESSION ['game'] ['removed'] = $this->removed;
 		$_SESSION ['game'] ['totalRemoved'] = $this->totalRemoved;
+		$_SESSION ['game'] ['horda'] = $this->horda;
+		$_SESSION ['game'] ['nivel'] = $this->nivel;
 	}
 	
-	/**
-	 * L� os dados da sess�o para a classe
-	 */
+	// Carrega os Dados Salvos na Sessão
 	public function getGame() {
 		if(empty($_SESSION['game']))
 			$this->quit();
@@ -177,240 +177,19 @@ class Jogo extends Generic {
 		}
 	}
 	
-	/**
-	 * Executa o jogo
-	 */
-	public function Game() {
-		echo "  <div id=\"action\">
-                    <h4 align=\"center\">AÇÕES</h4>
-                    " . self::drawAction () . "
-                </div>
-                <div id=\"hand\">
-                    <h4 align=\"center\">MÃO DO ADVERSÁRIO</h4>
-              	      " . self::drawHand () . "
-                    <br clear=\"all\">
-                </div>
-                <div id=\"board\">
-                    <h4 align=\"center\">CAMPO</h4>
-                    " . self::drawBoard () . "
-                    <br clear=\"all\">
-                </div>
-                <div id=\"cemiterio\">
-                    <h4 align=\"center\">CEMITERIO</h4>
-                    " . self::drawCemiterio () . "
-                    <br clear=\"all\">
-                </div>
-                <div id=\"removed\">
-                    <h4 align=\"center\">ZONA DE REMOVIDAS</h4>
-                    " . self::drawRemoved () . "
-                    <br clear=\"all\">
-                </div>";
-		self::saveGame ();
-	}
-	
-	/**
-	 * Retorna a interface do topo
-	 * 
-	 * @return string
-	 */
-	private function drawAction() {
-		$html = "
-				<fieldset>
-  					<legend> ETAPAS </legend>
-                    <a href=\"?op=draw\" /><img src='images/button/draw.png' alt='Comprar' title='Comprar'></a>  <img src='images/button/divisoria.png'>
-                    <a href=\"?op=play\" /><img src='images/button/play.png' alg='Jogar Cartas' title='Jogar Cartas'></a>  <img src='images/button/divisoria.png'>
-        			<a href=\"?op=attack\"><img src='images/button/attack.png' alt='Atacar' title='Atacar'></a>
-				</fieldset>
-				<fieldset>
-  					<legend> ADICIONAR TOKEN </legend>
-					<form id='add_zumbi' method='GET' action='jogo.php'>
-						<select name='add_zumbi'>";
-				for($i=1;$i <= 10; $i++)
-					$html .= "
-							<option value='$i'>$i</option>";
-		$html .= "
-						</select>
-						<img src='images/button/token.png' onclick='submitForm(\"add_zumbi\");' alt='Adicionar Zumbi 2/2' title='Adicionar Zumbi 2/2'> 
-					</form>
-				 	<img src='images/button/divisoria.png'>
-					<b> <a href=\"?op=add13Zumbi\"><img src='images/button/token_13.png' alt='Adicionar 13 Fichas 2/2 Viradas' title='Adicionar 13 Fichas 2/2 Viradas'></a></b>
-				</fieldset>
-				<fieldset>
-  					<legend> DANO </legend>
-					<form id='remove' method='GET' action='jogo.php'>
-						<select name='remove'>";
-				for($i=1;$i <= 10; $i++)
-					$html .= "
-							<option value='$i'>$i</option>";
-		$html .= "
-						</select>
-						<img src='images/button/excluir.png' onclick='submitForm(\"remove\");' alt='Remover Cartas do Topo' title='Remover Cartas do Topo'> 
-					</form>
-				</fieldset>
-				<fieldset>
-  					<legend> MILL </legend>
-					<form id='mill' method='GET' action='jogo.php'>
-						<select name='mill'>";
-				for($i=1;$i <= 10; $i++)
-					$html .= "
-							<option value='$i'>$i</option>";
-		$html .= "
-						</select>
-						<img src='images/button/mill.png' onclick='submitForm(\"mill\");' alt=' Millar Cartas do Topo' title='Millar Cartas do Topo'> 
-					</form>
-				</fieldset>
-				<fieldset>
-  					<legend> STATUS DO DECK </legend> 
-					<img src='images/button/grimorio.png' alt='Grimório' title='Grimório'> <b>". $this->totalLibrary . "</b> <img src='images/button/divisoria.png'> 
-					<img src='images/button/cemiterio.png' alt='Cemitério' title='Cemitério'> <b>" .$this->totalCemiterio . "</b> <img src='images/button/divisoria.png'> 
-					<img src='images/button/exilada.png' alt='Cartas Exiladas' title='Cartas Exiladas'> <b>" .$this->totalRemoved . "</b> 
-				</fieldset>
-				<fieldset>
-  					<legend> SAIR </legend> 
-					  <a href=\"?op=quit\" />
-						  <img src='images/button/quit.png' alt='Sair do Jogo' title='Sair do Jogo'> 
-					  </a>
-				</fieldset>
-				";
-		return $html;
-	}
-	
-	/**
-	 * Retorna a interface da m�o do jogador
-	 */
-	private function drawHand() {
+	// Renderiza o Jogo e Salva o Status na Sessão
+	public function Game() : void {
 		$html = "";
-		foreach ( $this->hand as $id => $carta )
-			$html .= "
-                    <div class=\"hand_card\">
-                        <a href=\"" . $carta ['image'] . "\" target=\"_new\"><img src='" . $carta ['icon'] . "'/></a>
-                    </div>";
-		return $html;
-	}
-	
-	private function drawTokenAttack($carta, $indice) {
-		return "<div class=\"board_card\">
-			    	<img src='" . $carta ['attack'] . "'/>
-        			<a href=\"?op=kill&id=$indice\"><img src='images/button/destroy.png' alt='Destruir' Title='Destruir'></a>
-        			</div>";
-	}
-	
-	private function drawCreatureAttack($carta, $indice) {
-		return "<div class=\"board_card\">
-			    	<img src='" . $carta ['attack'] . "'/> 
-			        <a href=\"?op=kill&id=$indice\"><img src='images/button/destroy.png' alt='Destruir' Title='Destruir'></a>
-			        <a href=\"?op=bounce&id=$indice\"><img src='images/button/bounce.png' alt='Retornar pra mão' Title='Retornar pra mão'></a>
-		        </div>";
-	}
-	
-	private function drawToken($carta, $indice) {
-		return "<div class=\"board_card\">
-			    	<img src='" . $carta ['icon'] . "'/>
-        			<a href=\"?op=kill&id=$indice\"><img src='images/button/destroy.png' alt='Destruir' Title='Destruir'></a>
-        			<a href=\"?op=tap&id=$indice\"><img src='images/button/tap.png' alt='Virar Criatura' Title='Virar Criatura'></a>
-        		</div>";
-	}
-	private function drawCard($carta, $indice) {
-		return "<div class=\"board_card\">
-			    	<img src='" . $carta ['icon'] . "'/>
-  			    	<a href=\"?op=kill&id=$indice\"><img src='images/button/destroy.png' alt='Eliminar' Title='Eliminar'></a>
-   			    	<a href=\"?op=bounce&id=$indice\"><img src='images/button/bounce.png' alt='Retornar pra mão' Title='Retornar pra mão'></a>
-        			<a href=\"?op=tap&id=$indice\"><img src='images/button/tap.png' alt='Virar Criatura' Title='Virar Criatura'></a>
-   			    </div>";
-	}
-	private function drawTapCard($carta, $indice) {
-		return "<div class=\"board_card\">
-			    	<img src='" . $carta ['tap'] . "'/>
-			    	<a href=\"?op=kill&id=$indice\"><img src='images/button/destroy.png' alt='Eliminar' Title='Eliminar'></a>
-			    	<a href=\"?op=bounce&id=$indice\"><img src='images/button/bounce.png' alt='Retornar pra mão' Title='Retornar pra mão'></a>
-    	    	</div>";
-	}
-	private function DrawTapToken($carta, $indice) {
-		return "<div class=\"board_card\">
-			    	<img src='" . $carta ['tap'] . "'/>
-   			    	<a href=\"?op=kill&id=$indice\"><img src='images/button/destroy.png' alt='Eliminar' Title='Eliminar'></a>
-   		    	</div>";
-	}
-	
-	private function drawSpellCard($carta, $indice) {
-		return "<div class=\"board_card\">
-			    	<img src='" . $carta ['icon'] . "'/>
-			    	<a href=\"?op=kill&id=$indice\"><img src='images/button/destroy.png' alt='Eliminar' Title='Eliminar'></a>
-			    	<a href=\"?op=bounce&id=$indice\"><img src='images/button/bounce.png' alt='Retornar pra mão' Title='Retornar pra mão'></a>
-    	    	</div>";
-	}
-	
- 	/**
-	 * Retorna a tela do jogo
-	 * 
-	 * @return string
-	 */
-	private function drawBoard() {
-		$html = "";
-		foreach ( $this->board as $indice => $carta ) 
-		{
-			
-			if($carta['type'] == SPELL OR $carta['type'] == ENCHANTMENT)
-				$html .= self::drawSpellCard ( $carta, $indice );
-			else if($carta['type'] == TOKEN)
-			{
-				if(empty($carta['status']))
-					$html .= self::drawToken ( $carta, $indice );
-				else if($carta['status'] == ATTACK)
-					$html .= self::drawTokenAttack ( $carta, $indice );
-				else if($carta['status'] == TAP)
-					$html .= self::DrawTapToken ( $carta, $indice );
-				else if($carta['status'] == NAO_ATTACK)
-					$html .= self::drawToken ( $carta, $indice );
-			}
-			else if($carta['type'] == CREATURE)
-			{
-				if(empty($carta['status']))
-					$html .= self::drawCard ( $carta, $indice );
-				else if($carta['status'] == ATTACK)
-					$html .= self::drawCreatureAttack( $carta, $indice );
-				else if($carta['status'] == TAP)
-					$html .= self::drawTapCard ( $carta, $indice );
-				else if($carta['status'] = NAO_ATTACK)
-					$html .= self::drawCard ( $carta, $indice );
-			}
-		}
-		return $html;
-	}
-	
-	/**
-	 * Retorna o cemit�rio
-	 * 
-	 * @return string
-	 */
-	private function drawCemiterio() {
-		$html = "";
-		foreach ( $this->cemiterio as $id => $carta ) {
-			if ($carta ['type'] != TOKEN) {
-				$html .= "
-	                    <div class=\"cemiterio_card\">
-	                        <a href=\"" . $carta ['image'] . "\" target=\"_new\"><img class='card_icone' src='" . $carta ['icon'] . "'/> </a>
-	                        <a href=\"?op=goBack&id=$id\"><img id='icone' src='images/button/bounce.png' alt='Retornar pro Jogo' Title='Retornar pro Jogo'></a>
-	                        <a href=\"?op=RemoveBack&id=$id\"><img id='icone' src='images/button/remove.png' alt='Remova do Cemitério' Title='Remova do Cemitério'></a>
-	                    </div>";
-			}
-		}
-		return $html;
-	}
-	
-	private function drawRemoved() {
-		$html = "";
-		foreach ( $this->removed as $id => $carta ) 
-		{
-			if ($carta ['type'] != TOKEN) 
-			{
-				$html .= "
-	                    <div class=\"cemiterio_card\">
-	                        <a href=\"" . $carta ['image'] . "\" target=\"_new\"><img class='card_icone' src='" . $carta ['icon'] . "'/> </a>
-		                </div>";
-			}
-		}
-		return $html;
+		$html .= Graphic::drawMenu($this->totalCemiterio, $this->totalLibrary, $this->totalRemoved);
+		$html .= Graphic::drawHand($this->hand);
+		$html .= Graphic::drawBoard ($this->board);
+		$html .= Graphic::drawCemiterio ($this->cemiterio);
+		$html .= Graphic::drawRemoved ($this->removed);
+
+		echo $html;
+		
+		self::saveGame (); // Salva o Status Atual do Jogo
+		return;
 	}
 	
 	/**
@@ -457,13 +236,13 @@ class Jogo extends Generic {
 				$this->board [$id] ['status'] = NAO_ATTACK;
 		}
 	}
-	public function addZumbi($valor) {
+	public function addToken($valor) {
 		$tmp = $this->deck;
-		$zumbi = array_pop ( $tmp );
-		$zumbi['status'] = NAO_ATTACK;
+		$token = array_pop ( $tmp );
+		$token['status'] = NAO_ATTACK;
 		
 		for($i = 0; $i < $valor; $i++)
-			$this->board [] = $zumbi;
+			$this->board [] = $token;
 	}
 	
 	public function mill($value) {
@@ -493,17 +272,9 @@ class Jogo extends Generic {
 		header("location: index.php");
 		exit();
 	}
-	
-	public function add13Zumbi() {
-		$tmp = $this->deck;
-		$zumbi = array_pop ( $tmp );
-		$zumbi['status'] = TAP;
-		for($i = 0; $i < 13; $i++)
-			$this->board [] = $zumbi;
-	}
-	
+		
+	// Função de Ação de Ataque (Icone do Menu)
 	public function attack() {
-		$jogadorAtacavel = array ();
 		foreach ( $this->board as $id => $carta ) {
 			if ($carta ['type'] == SPELL)
 			{
@@ -515,6 +286,7 @@ class Jogo extends Generic {
 				$this->board [$id] ['status'] = ATTACK;
 		}
 	}
+
 	public function kill() {
 		if ($this->board [$_GET ['id']] ['type'] != TOKEN) {
 			if ($this->board [$_GET ['id']] ['type'] == CREATURE)
@@ -525,6 +297,7 @@ class Jogo extends Generic {
 		}
 		unset ( $this->board [$_GET ['id']] );
 	}
+
 	public function goBack() {
 		$this->board [] = $this->cemiterio [$_GET ['id']];
 		$this->totalCemiterio --;
@@ -540,9 +313,11 @@ class Jogo extends Generic {
 		$this->hand [] = $this->board [$_GET ['id']];
 		unset ( $this->board [$_GET ['id']] );
 	}
+
 	public function tap() {
 		$this->board [$_GET ['id']] ['status'] = TAP;
 	}
+
 	public function remove($value) {
 		if ($this->totalLibrary == 0)
 			return;
@@ -558,6 +333,7 @@ class Jogo extends Generic {
 		$this->totalLibrary -= $quantidade_menor;
 	}
 	
+	// Devolve pro Cemitério Carta Removida Por Engano
 	public function RemoveBack()
 	{
 		$this->removed[] = $this->cemiterio[$_GET['id']];
@@ -566,11 +342,12 @@ class Jogo extends Generic {
 		$this->totalCemiterio--;
 	}
 
+	// Verifica o Fim do Jogo (DeckOver + EmptyLibrary)
 	public function endGame() {
 		$fim = true;
 		if($this->totalLibrary == 0 && (count($this->hand) == 0))
 		{
-			if(count($this->board) != 0)
+			if(count($this->board) != 0) // Só Termina Se o BoardGame Tiver Apenas Encantamento (Type = 2)
 			{
 				foreach($this->board as $carta)
 				{
@@ -586,9 +363,7 @@ class Jogo extends Generic {
 			$fim = false;
 
 		if($fim == true)
-		{
 			echo "<script src=\"js/onOff.js\"></script>";
-		}
 
 	}
 }

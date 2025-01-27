@@ -1,0 +1,20 @@
+1;Maggot Carrier;1
+1;Forsaken Wastes;3
+1;Infectious Host;1
+1;Skulking Knight;1
+1;Death Baron;1
+1;Undead Warchief;1
+1;Grave Titan;1
+1;Damnation;2
+1;Plague Wind;2
+1;Endless Ranks of the Dead;3
+1;Necrotic Hex;2
+1;Call to the Grave;3
+1;Rotting Fensnake;1
+2;Noxious Ghoul;1
+2;Bad Moon;3
+3;Soulless One;1
+4;Walking Corpse;1
+4;Cackling Fiend;1
+4;Zombie Giant;0;1
+38;Zombie;0;1

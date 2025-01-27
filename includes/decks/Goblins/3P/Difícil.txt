@@ -1,0 +1,16 @@
+2;Goblin Rabblemaster;1
+2;Goblin Piledriver;1
+2;Legion Loyalist;1
+3;Goblin Instigator;1
+3;Daggersail Aeronaut;1
+3;Goblin Chainwhirler;1
+3;Boggart Ram Gang;1
+3;Beetleback Chief;1
+3;Goblin King;1
+3;Boartusk Liege;1
+3;Battle Squadron;1
+2;Hordeling Outburst;2
+2;Volcanic Rush;2
+2;Dralnus Crusade;3
+58;Goblin 2;0;1
+2;Goblin;0;1

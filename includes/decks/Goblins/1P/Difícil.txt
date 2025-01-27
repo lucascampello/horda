@@ -1,0 +1,14 @@
+1;Battle Squadron;1
+1;Bloodmark Mentor;1
+2;Beetleback Chief;1
+1;Boartusk Liege;1
+1;Boggart Ram Gang;1
+1;Goblin Chainwhirler;1
+1;Goblin King;1
+1;Goblin Piledriver;1
+1;Legion Loyalist;1
+1;Daggersail Aeronaut;1
+1;Volcanic Rush;2
+1;Hordeling Outburst;2
+15;Goblin 2;0;1
+3;Goblin;0;1

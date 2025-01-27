@@ -1,0 +1,14 @@
+4;Poison-Tip Archer;1
+4;Dwynens Elite;1
+4;Heedless One;1
+2;Drove_of_Elves;1
+3;Steel Leaf Champion;1
+3;Wilt-Leaf Liege;1
+2;Eyeblight Massacre;2
+2;Elvish_Promenade;2
+2;Overrun;2
+1;Cover of Darkness;3
+1;Elderfang Venom;3
+10;Elf Warrior 4;0;1
+30;Elf Warrior 2;0;1
+2;Elf Warrior;0;1

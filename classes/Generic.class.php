@@ -1,38 +1,41 @@
 <?php
+namespace Classes;
+
 if(!defined("ERRO"))
     require("includes/define.inc.php");
 
+// Classe de Mensageria do Sistema
 class Generic 
 {
-    private $mensagem;
-    private $status;
+    private string $mensagem;
+    private bool $status;
     
     public function __construct()
     {
-        $this->mesage = "";
+        $this->mensagem = "";
         $this->status = OK;
     }
     
-    public function setWarning($msg = "")
+    public function setWarning($msg = "") : void
     {
-        $this->mesage= $msg;
+        $this->mensagem= $msg;
         $this->status = ERRO;
     }
     
-    public function setOK($msg = "")
+    public function setOK($msg = "") : void
     {
-        $this->mesage= $msg;
+        $this->mensagem= $msg;
         $this->status = OK;
     }
     
-    public function getState()
+    public function getState() : bool
     {
         return $this->status;
     }
     
-    public function getMesage()
+    public function getMesage() : string
     {
-        return $this->mesage;
+        return $this->mensagem;
     }
     
 }

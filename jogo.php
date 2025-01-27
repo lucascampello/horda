@@ -1,22 +1,26 @@
 <?php
-session_start();
+require("classes/Autoloader.class.php");
 require("includes/define.inc.php");
-require("classes/Jogo.class.php");
+session_start();
+
+use Classes\Jogo;
+
 $objJogo = new Jogo();
 $objJogo->getGame();
+
 if(!empty($_GET['op']))
 {
     $acao = $_GET['op'];
     $objJogo->$acao();
 }
-else if(!empty($_GET['add_zumbi']))
-	$objJogo->addZumbi($_GET['add_zumbi']);
+else if(!empty($_GET['add_token']))
+	$objJogo->addToken($_GET['add_token']);
 else if(!empty($_GET['remove']))
 	$objJogo->remove($_GET['remove']);
 else if(!empty($_GET['mill']))
 	$objJogo->mill($_GET['mill']);	
-else if(!empty($_GET['restart']))
-    $objJogo->restart();
+else if(!empty($_GET['quit']))
+    $objJogo->quit();
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
@@ -25,7 +29,7 @@ else if(!empty($_GET['restart']))
 		<title>Horda de Zumbi</title>
         <link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,600,700,900&display=swap" rel="stylesheet">
 		<link rel="stylesheet" href="css/jogo.css">
-		<link rel="shortcut icon" href="images/icone.ico" type="image/x-icon" />
+		<link rel="shortcut icon" href="images/icone.png" type="image/png" />
     </head>
     <body>
         <div id="centro">

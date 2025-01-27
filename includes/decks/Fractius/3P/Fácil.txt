@@ -1,0 +1,16 @@
+3;Drove of Elves;1
+4;Dwynens Elite;1
+3;Elven Riders;1
+3;Elvish Champion;1
+3;Elvish Doomsayer;1
+3;Gaeas Skyfolk;1
+3;Poison-Tip Archer;1
+3;Shaman of the Pack;1
+3;Steel Leaf Champion;1
+3;Wilt-Leaf Liege;1
+3;Eyeblight Massacre;2
+2;Overrun;2
+2;Elderfang Venom;3
+5;Elf Warrior 4;0;1
+53;Elf Warrior 2;0;1
+2;Elf Warrior;0;1
