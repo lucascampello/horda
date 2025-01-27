@@ -1,5 +1,5 @@
 <?php
-require("classes/Autoloader.class.php");
+require("Classes/Autoloader.class.php");
 require("includes/define.inc.php");
 session_start();
 
